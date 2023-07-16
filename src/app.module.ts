@@ -2,9 +2,32 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaService } from './prisma/prisma.service';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver } from '@nestjs/apollo';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { join } from 'path';
 
 @Module({
-  imports: [],
+  imports: [
+    GraphQLModule.forRootAsync({
+      driver: ApolloDriver,
+      useFactory: (config: ConfigService) => {
+        return {
+          cors: {
+            origin: config.get('CLIENT_URL'),
+          },
+          autoSchemaFile: join(
+            process.cwd(),
+            config.get<string>('SCHEMA_PATH'),
+          ),
+          sortSchema: true,
+          playground: true,
+        };
+      },
+      inject: [ConfigService],
+    }),
+    ConfigModule.forRoot({ isGlobal: true }),
+  ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
 })
