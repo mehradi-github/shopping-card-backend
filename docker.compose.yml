@@ -1,0 +1,9 @@
+services:
+db:
+  image: postgres:latest
+  ports:
+    - '5432':'5432'
+  envirment:
+    - POSTGRES_USER=root
+    - POSTGRES_PASSWORD=pass
+    - POSTGRES_DB=shopping_card_db  
